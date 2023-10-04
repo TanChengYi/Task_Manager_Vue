@@ -1,45 +1,37 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import fs from 'fs';
-import path from 'path';
+// src/store/index.js
+import { createStore } from 'vuex';
+import data from '@/data.json';  // Import JSON data
 
-Vue.use(Vuex);
-
-const jsonFilePath = path.resolve(__dirname, '../tasks.json');
-
-function readJsonFile() {
-  const rawData = fs.readFileSync(jsonFilePath);
-  return JSON.parse(rawData);
-}
-
-function writeJsonFile(data) {
-  const jsonData = JSON.stringify(data, null, 2);
-  fs.writeFileSync(jsonFilePath, jsonData);
-}
-
-export default new Vuex.Store({
+const store = createStore({
   state: {
-    tasks: readJsonFile()
+    tasks: data.tasks  // Set initial state from JSON data
   },
   mutations: {
-    ADD_TASK(state, task) {
+    // Mutation to add a new task
+    addTask(state, task) {
       state.tasks.push(task);
-      writeJsonFile(state.tasks);
     },
-    EDIT_TASK(state, updatedTask) {
+    // Mutation to update an existing task
+    updateTask(state, updatedTask) {
       const index = state.tasks.findIndex(task => task.id === updatedTask.id);
       if (index !== -1) {
         state.tasks.splice(index, 1, updatedTask);
-        writeJsonFile(state.tasks);
+      }
+    },
+    // Mutation to delete a task
+    deleteTask(state, taskId) {
+      const index = state.tasks.findIndex(task => task.id === taskId);
+      if (index !== -1) {
+        state.tasks.splice(index, 1);
       }
     }
   },
   actions: {
-    addTask({ commit }, task) {
-      commit('ADD_TASK', task);
-    },
-    editTask({ commit }, updatedTask) {
-      commit('EDIT_TASK', updatedTask);
-    }
+    // Actions would go here, if any
+  },
+  getters: {
+    // Getters would go here, if any
   }
 });
+
+export default store;
